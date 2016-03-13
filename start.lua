@@ -15,7 +15,8 @@ local scene = composer.newScene()
 function scene:create( event )
 
     local sceneGroup = self.view
-
+    road=display.newRect( 0, 0, dw, dh )
+    road.fill={type="image", filename="road.png"}
     -- Initialize the scene here
     -- Example: add display objects to "sceneGroup", add touch listeners, etc.
 end

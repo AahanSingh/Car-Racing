@@ -1,6 +1,7 @@
 local composer = require( "composer" )
 
 local scene = composer.newScene()
+local pix=0
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called
@@ -19,6 +20,9 @@ function scene:create( event )
     dw=display.contentWidth
     print( dh )
     print( dw )
+    x=display.contentCenterX
+    print(x)
+    print(dw/2)
     -- Initialize the scene here
     -- Example: add display objects to "sceneGroup", add touch listeners, etc.
     ---------ROAD---------
@@ -26,22 +30,59 @@ function scene:create( event )
     road.fill={type="image",filename="road.png"}
     road.anchorX,road.anchorY=0,0
     road.contentHeight=dh
+    sceneGroup:insert(road)
+    road.speed=5
+
+    roadCopy=display.newRect( 0, 0, dw, dh )
+    roadCopy.fill={type="image",filename="road.png"}
+    roadCopy.anchorX,roadCopy.anchorY=0,1
+    roadCopy.contentHeight=dh
+    sceneGroup:insert(roadCopy)
+    roadCopy.speed=5
+    ----PLAYER CAR--------
+    car=display.newRect( dw/2, dh-10, dw/9, dw/4.5 )
+    car.fill={type="image", filename="player.png"}
+    car.anchorY=1
+    sceneGroup:insert(car)
 end
 
 
 -- "scene:show()"
 function scene:show( event )
-
-    local sceneGroup = self.view
-    local phase = event.phase
-
-    if ( phase == "will" ) then
-        -- Called when the scene is still off screen (but is about to come on screen)
-    elseif ( phase == "did" ) then
-        -- Called when the scene is now on screen
-        -- Insert code here to make the scene come alive
-        -- Example: start timers, begin animation, play audio, etc.
+    road.enterFrame=moveRoad
+    Runtime:addEventListener( "enterFrame", road)
+    roadCopy.enterFrame=moveRoad
+    Runtime:addEventListener( "enterFrame", roadCopy)
+ 
+end
+function moveRoad(self,event)
+    if self.y > dh-10 then
+        self.y=0
+        pix=pix+1
+        if pix > 500 then 
+            road.speed=road.speed+1
+            roadCopy.speed=roadCopy.speed+1
+            pix=0
+        else
+            print("less")
+        end
+    else
+        self.y=self.y+self.speed 
+        pix=pix+1
+         if pix > 500 then 
+            road.speed=road.speed+1
+            roadCopy.speed=roadCopy.speed+1
+            pix=0
+        else
+            print("less")
+        end
     end
+    if road.speed>20 or roadCopy.speed>20 then
+        road.speed=20
+        roadCopy.speed=20
+    end
+    print(road.speed)
+    print(roadCopy.speed)
 end
 
 
