@@ -1,5 +1,6 @@
 local composer = require( "composer" )
-
+local physics=require "physics"
+physics.start()
 local scene = composer.newScene()
 local pix=0
 local no=0
@@ -25,6 +26,8 @@ function scene:create( event )
     --print(dw/2)
     -- Initialize the scene here
     -- Example: add display objects to "sceneGroup", add touch listeners, etc.
+
+
     ---------ROAD---------
     road=display.newRect( 0, 0, dw, dh )
     road.fill={type="image",filename="road.png"}
@@ -39,6 +42,8 @@ function scene:create( event )
     roadCopy.contentHeight=dh
     sceneGroup:insert(roadCopy)
     roadCopy.speed=5
+
+
     ----PLAYER CAR--------
     car=display.newRect( dw/2, dh-10, dw/8, dw/4.5 )
     car.fill={type="image", filename="player.png"}
@@ -49,51 +54,79 @@ function scene:create( event )
     car.posC=center+dw/4.75
     car.current=car.posB
     sceneGroup:insert(car)
+	----CAR--------
+    car1=display.newRect( dw/2, 0, dw/8, dw/4.5 )
+    car1.fill={type="image", filename="car_red_1.png"}
+    car1.anchorY=1
+    center=dw/2
+    car1.posA=center-dw/4.75
+    car1.posB=center
+    car1.posC=center+dw/4.75
+    car1.current=car1.posB
+	 car1.speed=5
+    sceneGroup:insert(car)
     --print(dw/2)
+	 
+	 physics.addBody(car,"dynamic",{density=0.1, bounce=0.1, friction=0.1, radius=50})
+	 physics.addBody(car1,"static",{density=1, bounce=0, friction=0.1, radius=20})
+	 car.gravityScale = 0
 end
 
 
 -- "scene:show()"
 function scene:show( event )
+	print("show")
     road.enterFrame=moveRoad
     Runtime:addEventListener( "enterFrame", road)
     roadCopy.enterFrame=moveRoad
     Runtime:addEventListener( "enterFrame", roadCopy)
-    Runtime:addEventListener("tap",touchScreen)
+	 car1.enterFrame=moveCar
+    Runtime:addEventListener( "enterFrame", car1)
 end
-function moveCar(moveTo)
-    car.x=moveTo
-    car.current=moveTo
+function moveCar(self,event)
+   math.randomseed( 100 )
+	local q=math.random()
+	--print(q)
+	print(math.ceil(q)*1000 %3)
+	if((math.ceil(q)*1000 %3) ==1) then
+		car1.speed=math.random()%10*10
+		print(car1.speed)
+		car1.y=car1.y+car1.speed
+	end
+	if(self.y>dh) then
+		self.y=0
+		end
 end
+
 function touchScreen(event)
-    print("TOUCHED")
-    print(no)
-    if no==0 then
-        no=no+1
-        if event.phase == "ended" then
-            x=event.x
-            if x>center and car.current==car.posA then
-                --move to B
-                moveCar(car.posB)
-            elseif x>center and car.current==car.posB then
-                --move to C
-                moveCar(car.posC)
-            elseif x<center and car.current==car.posC then
-                --move to B
-                moveCar(car.posB)
-            elseif x<center and car.current==car.posB then
-                --move to A
-                moveCar(car.posA)
-            else
-                print("crash")
-            end
+    print("applied")
+    print(car.current)
+    if event.x < dw/2 then
+        
+        if car.current==car.posB then
+            car.x=car.posA
+            car.current=car.posA
+        elseif car.current == car.posC then
+            car.x=car.posB
+            car.current=car.posB    
         end
+    else
+
+        if car.current==car.posB then
+            car.x=car.posC
+            car.current=car.posC
+        elseif car.current == car.posA then
+            car.x=car.posB
+            car.current=car.posB    
+        end
+
     end
-end
+end    
 function moveRoad(self,event)
-    if self.y > dh-10 then
-        self.y=0
-        pix=pix+1
+    if self.y > dh-20 then
+        self.y=20
+			--print("back")
+        pix=pix+10
         if pix > 500 then 
             road.speed=road.speed+1
             roadCopy.speed=roadCopy.speed+1
@@ -103,7 +136,7 @@ function moveRoad(self,event)
         end
     else
         self.y=self.y+self.speed 
-        pix=pix+1
+        pix=pix+10
          if pix > 500 then 
             road.speed=road.speed+1
             roadCopy.speed=roadCopy.speed+1
@@ -155,7 +188,7 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
-
+Runtime:addEventListener("tap",touchScreen)
 -- -------------------------------------------------------------------------------
 
 return scene
