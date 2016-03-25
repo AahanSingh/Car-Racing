@@ -1,6 +1,6 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
-
+print( "RESTART" )
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called
 -- -----------------------------------------------------------------------------------------------------------------
@@ -9,37 +9,47 @@ local scene = composer.newScene()
 
 -- -------------------------------------------------------------------------------
 
+local bg
 
 -- "scene:create()"
+local function touch(event)
+    
+    --composer.removeScene( "restart")
+    print( "touch" )
+    rem()
+    --composer.gotoScene("game")
+end
+function rem()
+    bg:removeEventListener("tap",touch)
+    composer.removeScene( "restart")
+    composer.gotoScene("game")
+end
 function scene:create( event )
 
     
         local sceneGroup = self.view
         dh=display.contentHeight
         dw=display.contentWidth
-        local bg=display.newRect(0, 0, dw, dh )
+        bg=display.newRect(0, 0, dw, dh )
         bg.anchorX,bg.anchorY=0,0
-        local res=display.newRect( 0, dh/2, dw, 200 )
+        local res=display.newRect( 0, dh/2, dw, 500 )
         res.fill={type="image",filename="Restart.png"}
         res.anchorX=0
         res.anchorY=0
+        sceneGroup:insert(bg)   
         sceneGroup:insert(res)
-        sceneGroup:insert(bg)
+        bg:addEventListener("tap",touch)
 end
 
 -- "scene:show()"
 function scene:show( event )
     if(event.phase=="did")then
-        Runtime:addEventListener("tap",touch)
+        --Runtime:addEventListener("tap",touch)
     end
 end
 
 
-function touch(event)
-    composer.removeScene( "restart")
-    Runtime:removeEventListener("tap",touchScreen)
-    composer.gotoScene("game")
-end
+
 
 
 function scene:hide( event )
