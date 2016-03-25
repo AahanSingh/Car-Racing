@@ -4,8 +4,8 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 local pix=0
 local no=0
-local physics=require "physics"
-physics.start()
+--local physics=require "physics"
+--physics.start()
 x=2000
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called
@@ -17,10 +17,11 @@ x=2000
 
 local opp1
 local opp
+local sceneGroup
 -- "scene:create()"
 function scene:create( event )
     print("Scene:create")
-    local sceneGroup = self.view
+    sceneGroup = self.view
     
     --print(x)
     --print(dw/2)
@@ -54,44 +55,90 @@ function scene:create( event )
     car.posC=center+dw/4.75
     car.current=car.posB
     sceneGroup:insert(car)
+    --physics.addBody(car,"dynamic",{density=1, bounce=0.1, friction=0.2})
+    car.gravityScale=0
+    --physics.addBody(opp,"static",{density=1, bounce=0.1, friction=0.2})
+    --physics.addBody(opp1,"static",{density=1, bounce=0.1, friction=0.2})
     randomobject()
-    --print(dw/2)
-    --timer.performWithDelay( 1200, randomobject,10000000000)
-    physics.addBody(car,"dynamic",{density=1, bounce=0.1, friction=0.2})
-	car.gravityScale=0
-    sceneGroup:insert( opp)
-    sceneGroup:insert( opp1)
-    
-    
-
-end
-
-
-local function onLocalCollision( self, event )
-    print("collision")
-    if ( event.phase == "began" ) then
-        removeListeners()
-        --print( "collision" )
-    elseif ( event.phase == "ended" ) then
-        --print( self.myName .. ": collision ended with " .. event.other.myName )
-    end
 end
 
 
 
 -- "scene:show()"
 function scene:show( event )
-    print("Scene:show")
+    
     if(event.phase=="did") then
+        print("Scene:show")
+        car.enterFrame=onLocalCollision
+        --Runtime:addEventListener( "enterFrame", car )  
         road.enterFrame=moveRoad
         Runtime:addEventListener( "enterFrame", road)
         roadCopy.enterFrame=moveRoad
         Runtime:addEventListener( "enterFrame", roadCopy)
-        car.collision = onLocalCollision
-        Runtime:addEventListener( "collision", car )
         Runtime:addEventListener("tap",touchScreen)
+        opp.enterFrame,opp1.enterFrame=moveoppcar,moveoppcar
+        Runtime:addEventListener("enterFrame", opp)
+        Runtime:addEventListener("enterFrame", opp1)
     end
 end
+
+
+
+
+
+
+-- "scene:hide()"
+function scene:hide( event )
+    print("Scene:hide")
+    local sceneGroup = self.view
+    local phase = event.phase
+
+    if ( phase == "will" ) then
+        -- Called when the scene is on screen (but is about to go off screen)
+        -- Insert code here to "pause" the scene
+        -- Example: stop timers, stop animation, stop audio, etc.
+    elseif ( phase == "did" ) then
+        -- Called immediately after scene goes off screen
+    end
+end
+
+
+-- "scene:destroy()"
+function scene:destroy( event )
+    print("Scene:destroy")
+    local sceneGroup = self.view
+
+    -- Called prior to the removal of scene's view
+    -- Insert code here to clean up the scene
+    -- Example: remove display objects, save state, etc.
+end
+function onLocalCollision( event )
+    
+    if(opp==nil) then
+        opp=display.newRect( center-dw/4.75, 30, dw/8, dw/4.5 )
+        return
+    else
+        if( ((car.x-opp.x)==0 and (car.y-opp.y)==0))then
+            print("collision")
+            removeListeners()
+        end
+    end
+
+     if(opp1==nil) then
+        opp1=display.newRect( center-dw/4.75, 30, dw/8, dw/4.5 )
+        return
+    else
+        if( ((car.x-opp1.x)==0 and (car.y-opp1.y)==0))then
+            print("collision")
+            removeListeners()
+        end
+    end
+
+end
+
+
+
+
 
 
 function touchScreen(event)
@@ -119,11 +166,9 @@ function touchScreen(event)
     end
 end
 
-
-
 function moveRoad(self,event)
-    print("moveRoad")
-    print( pix )
+    --print("moveRoad")
+    
     if self.y > dh-20 then
         self.y=20
         pix=pix+10
@@ -159,17 +204,19 @@ count=1
 function randomobject(event)
     print("randomobject")
     math.randomseed( os.time() )
+    opp=display.newRect( center-dw/4.75, 30, dw/8, dw/4.5 )
+    opp1=display.newRect( center-dw/4.75, 30, dw/8, dw/4.5 )
     local position = math.random(1, 3)
     local cartype = math.random(1, 3)
-    opp=display.newRect( center-dw/4.75, 30, dw/8, dw/4.5 )
-    physics.addBody(opp,"static",{density=1, bounce=0.1, friction=0.2})
+    
+    --physics.addBody(opp,"static",{density=1, bounce=0.1, friction=0.2})
     opp.gravityScale=0
 
     
     local position1=math.random(1,3)
     local cartype1 = math.random(1, 3)
-    opp1=display.newRect( center-dw/4.75, 30, dw/8, dw/4.5 )
-    physics.addBody(opp1,"static",{density=1, bounce=0.1, friction=0.2})
+    
+    --physics.addBody(opp1,"static",{density=1, bounce=0.1, friction=0.2})
     opp1.gravityScale=0
 
     if(position==prevP) then
@@ -223,18 +270,16 @@ function randomobject(event)
     end
     opp1.speed=math.random(10,15)
     
-
+    sceneGroup:insert(opp)
+    sceneGroup:insert(opp1)
     prevP=position
     prevS=opp.speed
-    opp.enterFrame=moveoppcar
-    opp1.enterFrame=moveoppcar
     Runtime:addEventListener("enterFrame", opp)
     Runtime:addEventListener("enterFrame", opp1)
-    
 end
 count1=0
 function moveoppcar(self, event)
-    print("moveoppcar")
+    --print("moveoppcar")
     --print(self.y)
     if(self.y>dh) then
         Runtime:removeEventListener( "enterFrame", self )
@@ -245,48 +290,23 @@ function moveoppcar(self, event)
             randomobject()
             count1=0
         end
-    end
-    self.y=self.y+self.speed+roadCopy.speed
-    
-end
-
--- "scene:hide()"
-function scene:hide( event )
-    print("Scene:hide")
-    local sceneGroup = self.view
-    local phase = event.phase
-
-    if ( phase == "will" ) then
-        -- Called when the scene is on screen (but is about to go off screen)
-        -- Insert code here to "pause" the scene
-        -- Example: stop timers, stop animation, stop audio, etc.
-    elseif ( phase == "did" ) then
-        -- Called immediately after scene goes off screen
+    else
+        self.y=self.y+self.speed+roadCopy.speed
     end
 end
 
 
--- "scene:destroy()"
-function scene:destroy( event )
-    print("Scene:destroy")
-    local sceneGroup = self.view
-
-    -- Called prior to the removal of scene's view
-    -- Insert code here to clean up the scene
-    -- Example: remove display objects, save state, etc.
-end
 function removeListeners()
     print("removeListeners")
     Runtime:removeEventListener( "enterFrame", road)
     Runtime:removeEventListener( "enterFrame", roadCopy)
-    Runtime:removeEventListener( "collision", car )
     Runtime:removeEventListener("tap",touchScreen)
     Runtime:removeEventListener("enterFrame", opp)
     Runtime:removeEventListener("enterFrame", opp1)
+    Runtime:removeEventListener( "enterFrame", car )  
     composer.removeScene( "game")
     composer.gotoScene( "restart")
 end
-
 -- -------------------------------------------------------------------------------
 
 -- Listener setup
