@@ -5,11 +5,6 @@
 -----------------------------------------------------------------------------------------
 
 -- Your code here
-	dh=display.contentHeight
-    dw=display.contentWidth
-    --print( dh )
-    --print( dw )
-    x=display.contentCenterX
-local composer=require("composer")
-composer.gotoScene("game") 
-	
+local composer = require( "composer" )
+
+    composer.gotoScene( "menu" )

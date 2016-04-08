@@ -2,8 +2,8 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
---local enginestart = audio.loadSound( "enginestart.mp3" )
---backgroundMusicChannel = audio.play( enginestart, { channel=1, loops=-1, fadein=5000 } )
+local enginestart = audio.loadSound( "enginestart.mp3" )
+backgroundMusicChannel = audio.play( enginestart, { channel=1, loops=-1, fadein=5000 } )
 
 
 local widget = require( "widget" )
@@ -16,10 +16,8 @@ local widget = require( "widget" )
 -- -------------------------------------------------------------------------------
 local function handleChangeButton( event )
     if event.phase == "ended" then
-        composer.removeHidden()
-        composer.gotoScene( "game")
-        composer.removeHidden()
-        composer.removeScene( "restart",false)
+        audio.stop( 1 )
+        composer.gotoScene( "game", { effect = "crossFade", time = 500 } )
     end
     return true
 end
@@ -34,7 +32,7 @@ function scene:create( event )
          left = 100,
         top = 200,
         id = "button1",
-        label = "Restart",
+        label = "New Game",
         fontSize=30,
          onEvent = handleChangeButton
     })
