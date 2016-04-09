@@ -3,8 +3,8 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 local enginestart = audio.loadSound( "enginestart.mp3" )
-backgroundMusicChannel = audio.play( enginestart, { channel=1, loops=-1, fadein=5000 } )
-
+backgroundMusicChannel = audio.play( enginestart, { channel=1, loops=-1, fadein=2000 } )
+audio.setVolume( 1, { channel=1 } )
 
 local widget = require( "widget" )
 -- -----------------------------------------------------------------------------------------------------------------

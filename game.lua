@@ -25,12 +25,16 @@ local sceneGroup
 local roadCopy
 local road
 local car
-local scoreText
-local score     
+local score
+local ScoreText
+local abc
+
+
 
 local carmoving = audio.loadSound( "carstarted.mp3" )
-backgroundMusicChannel2 = audio.play( carmoving, { channel=2, loops=-1, fadein=0 } )
-
+backgroundMusicChannel2 = audio.play( carmoving, { channel=2, fadein=0 } )
+local gear=audio.loadSound("chgGear.mp3")
+backgroundMusicChannel2=audio.play( gear,{ channel=4, loops=-1, fadein=13 } )
 -- "scene:create()"
 function scene:create( event )
     print("Scene:create")
@@ -69,10 +73,13 @@ function scene:create( event )
     randomobject2()
 
     ------SCORE--------
-    scoreText = display.newText( "", display.contentCenterX, 232, native.systemFontBold, 32 )
+    
+    scoreText = display.newText( "", 130, 10, "Helvetica", 32 )
     scoreText.anchorX,scoreText.anchorY=0,0
-    score = 750800
+    score = 1000
     sceneGroup:insert(scoreText)
+    
+    
 end
 local function lerp( v0, v1, t )
     return v0 + t * (v1 - v0)
@@ -86,13 +93,17 @@ local function showScore( target, value, duration, fps )
     local increment = lerp( 0, value, 1/passes )
 
     local count = 0
+    
     local function updateText()
         if count < passes then
             newScore = newScore + increment
             target.text = string.format( "%07d", newScore )
+            abc = math.floor(newScore)
             count = count + 1
         else
+          
             target.text = string.format( "%07d", value )
+            abc = math.floor(value)
             Runtime:removeEventListener( "enterFrame", updateText )
         end
     end
@@ -100,7 +111,7 @@ local function showScore( target, value, duration, fps )
     Runtime:addEventListener( "enterFrame", updateText )
 end
 local duration = 2000
-local fps = 30
+local fps = 0.2
 
 -- "scene:show()"
 function scene:show( event )
@@ -119,13 +130,19 @@ end
 local function onLocalCollision(self, event )
     print( "collision" )
     print(self.name)
+    print(abc)
+    audio.stop( backgroundMusicChannel2 )
     Runtime:removeEventListener("collision",onLocalCollision)
     local crash = audio.loadSound( "crash.mp3" )
     backgroundMusicChannel3 = audio.play( crash, { channel=3, fadein=0 } )
+   
+    value = abc
+    composer.setVariable( "fin", abc )
 
     composer.removeScene( "game",false)
+    
     composer.gotoScene( "restart")
-
+    
     
 end
 
@@ -157,8 +174,8 @@ local function moveRoad(self,event)
     if(self.y==nil) then
         return
     end
-    if self.y > dh-20 then
-        self.y=20
+    if self.y > dh-25 then
+        self.y=25
         pix=pix+10
         if pix > 100 then 
             road.speed=road.speed+1
