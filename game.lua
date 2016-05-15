@@ -44,14 +44,14 @@ function scene:create( event )
     sceneGroup = self.view
     physics.start()
     ---------ROAD---------
-    road=display.newRect( 0, 0, dw, dh )
+    road=display.newRect( 0, 0, dw+10, dh+50 )
     road.fill={type="image",filename="road.png"}
     road.anchorX,road.anchorY=0,0
     road.contentHeight=dh
     sceneGroup:insert(road)
     road.speed=5
 
-    roadCopy=display.newRect( 0, 0, dw, dh )
+    roadCopy=display.newRect( 0, 0, dw+10, dh+50 )
     roadCopy.fill={type="image",filename="road.png"}
     roadCopy.anchorX,roadCopy.anchorY=0,1
     roadCopy.contentHeight=dh

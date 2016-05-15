@@ -3,10 +3,16 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 local enginestart = audio.loadSound( "enginestart.mp3" )
-backgroundMusicChannel = audio.play( enginestart, { channel=1, loops=-1, fadein=2000 } )
-audio.setVolume( 1, { channel=1 } )
+
 
 local widget = require( "widget" )
+local splash
+
+dh=display.contentHeight
+dw=display.contentWidth
+
+backgroundMusicChannel = audio.play( enginestart, { channel=1, loops=-1, fadein=2000 } )
+audio.setVolume( 1, { channel=1 } )
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
@@ -18,6 +24,22 @@ local function handleChangeButton( event )
     if event.phase == "ended" then
         audio.stop( 1 )
         composer.gotoScene( "game", { effect = "crossFade", time = 500 } )
+    end
+    return true
+end
+
+local function handlehighscore( event )
+    if event.phase == "ended" then
+        audio.stop( 1 )
+        composer.gotoScene( "game", { effect = "crossFade", time = 500 } )
+    end
+    return true
+end
+
+local function handleinstruction( event )
+    if event.phase == "ended" then
+        audio.stop( 1 )
+        composer.gotoScene( "instruction", { effect = "crossFade", time = 500 } )
     end
     return true
 end
@@ -38,8 +60,34 @@ function scene:create( event )
     })
     sceneGroup:insert( changeButton )
     changeButton.x = display.contentCenterX
-    changeButton.y = display.contentCenterY
+    changeButton.y = display.contentCenterY -100
 
+    local highscore = widget.newButton({
+         left = 100,
+        top = 200,
+        id = "button2",
+        label = "Highest Score",
+        fontSize=30,
+         onEvent = handlehighscore
+    })
+    sceneGroup:insert( highscore )
+    highscore.x = display.contentCenterX
+    highscore.y = display.contentCenterY 
+
+
+    local instruction = widget.newButton({
+         left = 100,
+        top = 200,
+        id = "button3",
+        label = "Instructions",
+        fontSize=30,
+         onEvent = handleinstruction
+    })
+    sceneGroup:insert( instruction )
+    instruction.x = display.contentCenterX
+    instruction.y = display.contentCenterY + 100
+
+   
     -- Initialize the scene here.
     -- Example: add display objects to "sceneGroup", add touch listeners, etc.
 end
