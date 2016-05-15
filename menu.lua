@@ -31,7 +31,7 @@ end
 local function handlehighscore( event )
     if event.phase == "ended" then
         audio.stop( 1 )
-        composer.gotoScene( "game", { effect = "crossFade", time = 500 } )
+        composer.gotoScene( "highscore", { effect = "crossFade", time = 500 } )
     end
     return true
 end
